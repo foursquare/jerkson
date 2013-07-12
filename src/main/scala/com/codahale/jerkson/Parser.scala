@@ -3,8 +3,9 @@ package com.codahale.jerkson
 import io.Source
 import java.net.URL
 import com.codahale.jerkson.AST.{JValue, JNull}
-import org.codehaus.jackson.{JsonNode, JsonParser, JsonProcessingException}
-import org.codehaus.jackson.node.TreeTraversingParser
+import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException}
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.TreeTraversingParser
 import java.io.{EOFException, Reader, File, InputStream}
 
 trait Parser extends Factory {
@@ -76,7 +77,7 @@ trait Parser extends Factory {
 
   private[jerkson] def parse[A](parser: JsonParser, mf: Manifest[A]): A = {
     try {
-      if (mf.erasure == classOf[JValue] || mf.erasure == JNull.getClass) {
+      if (mf.runtimeClass == classOf[JValue] || mf.runtimeClass == JNull.getClass) {
         val value: A = parser.getCodec.readValue(parser, Types.build(mapper.getTypeFactory, mf))
         if (value == null) JNull.asInstanceOf[A] else value
       } else {
